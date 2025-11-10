@@ -41,7 +41,14 @@ public class StallController {
     }
 
     @GetMapping("/all")
-    public List<Stall> getAllStalls() {    
-    return this.stallService.getAllStalls();
+    public List<Stall> getAllStalls() {   
+       
+        return this.stallService.getAllStalls();
+    }
+
+    @PostMapping
+    public ResponseEntity<Stall> createStall(@RequestBody Stall stall) {       
+        Stall createdStall = this.stallService.createStall(stall);
+        return ResponseEntity.ok(createdStall);
     }
 }
