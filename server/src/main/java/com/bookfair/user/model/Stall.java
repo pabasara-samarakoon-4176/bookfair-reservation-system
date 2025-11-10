@@ -28,7 +28,7 @@ public class Stall {
     private List<Reservation> reservations;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private StallTypes size; 
 
     // Getters and setters
