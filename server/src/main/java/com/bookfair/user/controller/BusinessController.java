@@ -57,4 +57,11 @@ public class BusinessController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("error", "Business not found")));
     }
+    
+    @GetMapping("/all")
+    public List<Business> getAllBusinesses() {
+    return businessRepository.findAll();
+    }
+
+
 }
