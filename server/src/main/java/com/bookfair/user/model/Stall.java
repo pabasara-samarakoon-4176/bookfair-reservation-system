@@ -18,6 +18,13 @@ public class Stall {
     private String stallCode;
     private String category;
 
+    @PrePersist
+    public void prePersist() {
+        if (stallCode == null || stallCode.isEmpty()) {
+            stallCode = "ST-" + System.currentTimeMillis();
+        }
+    }
+
     @Column(precision = 10, scale = 2)
     private BigDecimal price;
     private Boolean isReserved;
