@@ -1,5 +1,6 @@
 package com.bookfair.user.model;
 
+import com.constants.StallTypes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
@@ -25,6 +26,10 @@ public class Stall {
     @OneToMany(mappedBy = "stall", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Reservation> reservations;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StallTypes size; 
 
     // Getters and setters
 
