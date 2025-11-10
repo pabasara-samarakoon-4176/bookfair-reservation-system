@@ -1,0 +1,7 @@
+/server/target/
+/server/.idea/
+/server/*.iml
+/server/*.log
+/server/*.class
+/server/*.jar
+/server/*.war
