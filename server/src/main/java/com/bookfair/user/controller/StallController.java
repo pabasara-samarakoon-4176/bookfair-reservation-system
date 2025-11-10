@@ -1,5 +1,6 @@
 package com.bookfair.user.controller;
 
+import com.bookfair.user.model.Business;
 import com.bookfair.user.model.Stall;
 import com.bookfair.user.repository.StallRepository;
 import org.springframework.http.ResponseEntity;
@@ -34,4 +35,10 @@ public class StallController {
         return stall.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/all")
+    public List<Stall> getAllStalls() {
+        return stallRepository.findAll();
+    }
+
 }
