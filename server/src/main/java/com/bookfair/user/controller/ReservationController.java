@@ -68,20 +68,6 @@ public class ReservationController {
         ));
     }
 
-    @GetMapping("/pending")
-    public ResponseEntity<?> getPendingReservations() {
-        try {
-            List<Reservation> pendingReservations = reservationRepository.findByStatus("PENDING");
-            return ResponseEntity.ok(Map.of(
-                    "count", pendingReservations.size(),
-                    "reservations", pendingReservations
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to fetch pending reservations: " + e.getMessage()));
-        }
-    }
-
     @GetMapping("/{userId}")
     public ResponseEntity<?> getReservationsByUser(@PathVariable Integer userId) {
         Optional<User> userOpt = userRepository.findById(userId);
