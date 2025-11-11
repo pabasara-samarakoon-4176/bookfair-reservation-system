@@ -62,22 +62,22 @@ public class AdminController {
 
             Reservation reservation = resOpt.get();
 
-            // Check if reservation is already approved or in another terminal state
+           
             if (!"PENDING".equalsIgnoreCase(reservation.getStatus())) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body(Map.of("error", "Only pending reservations can be approved. Current status: " + reservation.getStatus()));
             }
 
-            // Approve the reservation
+         
             reservation.setStatus("APPROVED");
             reservationRepository.save(reservation);
 
-            // Update stall status to RESERVED
+          
             Stall stall = reservation.getStall();
             stall.setStatus(StallStatuses.RESERVED);
             stallRepository.save(stall);
 
-            // Generate QR code if not already generated
+          
             byte[] qrBytes = reservation.getQrCodeImage();
             if (qrBytes == null || qrBytes.length == 0) {
                 try {
@@ -93,7 +93,7 @@ public class AdminController {
                     reservation.setQrCodeImage(qrBytes);
                     reservationRepository.save(reservation);
                 } catch (Exception e) {
-                    // If QR generation fails, we'll still send the email without QR
+                  
                     qrBytes = null;
                 }
             }
@@ -122,7 +122,7 @@ public class AdminController {
                             qrBytes
                     );
                 } else {
-                    // Send email without attachment if QR generation failed
+                   
                     emailService.sendReservationConfirmation(
                             reservation.getUser().getEmail(),
                             "Bookfair Reservation Approved",
@@ -131,7 +131,7 @@ public class AdminController {
                     );
                 }
             } catch (Exception emailException) {
-                // Log the error but don't fail the approval
+              
                 System.err.println("Failed to send confirmation email: " + emailException.getMessage());
             }
 
@@ -161,22 +161,22 @@ public class AdminController {
 
             Reservation reservation = resOpt.get();
 
-            // Only pending reservations can be declined
+          
             if (!"PENDING".equalsIgnoreCase(reservation.getStatus())) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body(Map.of("error", "Only pending reservations can be declined. Current status: " + reservation.getStatus()));
             }
 
-            // Decline the reservation
+           
             reservation.setStatus("DECLINED");
             reservationRepository.save(reservation);
 
-            // Update stall status to AVAILABLE
+           
             Stall stall = reservation.getStall();
             stall.setStatus(StallStatuses.AVAILABLE);
             stallRepository.save(stall);
 
-            // Send decline email to user
+         
             String emailBody = String.format(
                 "<h2>Bookfair Reservation Declined</h2>" +
                 "<p>Dear %s,</p>" +
