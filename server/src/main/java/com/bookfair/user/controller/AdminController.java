@@ -26,7 +26,7 @@ public class AdminController {
     private final QRCodeService qrCodeService;
     private final EmailService emailService;
 
-    public AdminController(ReservationRepository reservationRepository, StallRepository stallRepository, 
+    public AdminController(ReservationRepository reservationRepository, StallRepository stallRepository,
                          QRCodeService qrCodeService, EmailService emailService) {
         this.reservationRepository = reservationRepository;
         this.stallRepository = stallRepository;
@@ -48,7 +48,7 @@ public class AdminController {
                     .body(Map.of("error", "Failed to fetch pending reservations: " + e.getMessage()));
         }
     }
-    
+
     @PostMapping("/reservations/{reservationId}/approve")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> approveReservation(@PathVariable Integer reservationId) {
@@ -145,6 +145,73 @@ public class AdminController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to approve reservation: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/reservations/{reservationId}/decline")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> declineReservation(@PathVariable Integer reservationId) {
+        try {
+            Optional<Reservation> resOpt = reservationRepository.findById(reservationId);
+
+            if (resOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Reservation not found"));
+            }
+
+            Reservation reservation = resOpt.get();
+
+            // Only pending reservations can be declined
+            if (!"PENDING".equalsIgnoreCase(reservation.getStatus())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Map.of("error", "Only pending reservations can be declined. Current status: " + reservation.getStatus()));
+            }
+
+            // Decline the reservation
+            reservation.setStatus("DECLINED");
+            reservationRepository.save(reservation);
+
+            // Update stall status to AVAILABLE
+            Stall stall = reservation.getStall();
+            stall.setStatus(StallStatuses.AVAILABLE);
+            stallRepository.save(stall);
+
+            // Send decline email to user
+            String emailBody = String.format(
+                "<h2>Bookfair Reservation Declined</h2>" +
+                "<p>Dear %s,</p>" +
+                "<p>We regret to inform you that your reservation has been declined.</p>" +
+                "<p><b>Reservation ID:</b> %d<br>" +
+                "   <b>Stall:</b> %s<br>" +
+                "   <b>Status:</b> DECLINED</p>" +
+                "<p>If you have any questions, please contact us.</p>" +
+                "<p>Thank you for your interest in the Colombo International Bookfair.</p>",
+                reservation.getUser().getName(),
+                reservation.getReservationId(),
+                reservation.getStall().getStallCode()
+            );
+
+            try {
+                emailService.sendReservationConfirmation(
+                        reservation.getUser().getEmail(),
+                        "Bookfair Reservation Declined",
+                        emailBody,
+                        null
+                );
+            } catch (Exception emailException) {
+                System.err.println("Failed to send decline email: " + emailException.getMessage());
+            }
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Reservation declined successfully",
+                    "reservationId", reservationId,
+                    "stallCode", stall.getStallCode(),
+                    "newStatus", stall.getStatus(),
+                    "emailSent", true
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to decline reservation: " + e.getMessage()));
         }
     }
 }
