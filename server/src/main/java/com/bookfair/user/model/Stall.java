@@ -1,6 +1,7 @@
 package com.bookfair.user.model;
 
 import com.constants.StallTypes;
+import com.constants.StallStatuses;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
@@ -16,18 +17,14 @@ public class Stall {
 
     @Column(nullable = false, unique = true)
     private String stallCode;
-    private String category;
 
-    @PrePersist
-    public void prePersist() {
-        if (stallCode == null || stallCode.isEmpty()) {
-            stallCode = "ST-" + System.currentTimeMillis();
-        }
-    }
+    private String category;
 
     @Column(precision = 10, scale = 2)
     private BigDecimal price;
+
     private Boolean isReserved;
+
     private String locationCoordinates;
 
     @OneToMany(mappedBy = "stall", cascade = CascadeType.ALL)
@@ -36,9 +33,23 @@ public class Stall {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = true)
-    private StallTypes size; 
+    private StallTypes size;
 
-    // Getters and setters
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StallStatuses status;
+
+    @PrePersist
+    public void prePersist() {
+        if (stallCode == null || stallCode.isEmpty()) {
+            stallCode = "ST-" + System.currentTimeMillis();
+        }
+        if (status == null) {
+            status = StallStatuses.AVAILABLE; 
+        }
+    }
+
+    // Getters and Setters
 
     public Integer getStallId() {
         return stallId;
@@ -94,5 +105,21 @@ public class Stall {
 
     public void setReservations(List<Reservation> reservations) {
         this.reservations = reservations;
+    }
+
+    public StallTypes getSize() {
+        return size;
+    }
+
+    public void setSize(StallTypes size) {
+        this.size = size;
+    }
+
+    public StallStatuses getStatus() {
+        return status;
+    }
+
+    public void setStatus(StallStatuses status) {
+        this.status = status;
     }
 }
