@@ -33,11 +33,17 @@ public class AuthService {
             throw new RuntimeException("Email already registered");
         }
 
-        Business business = businessRepository.findById(businessId)
-                .orElseThrow(() -> new RuntimeException("Business not found."));
+        Business business = null;
+        if (!"admin".equals(role)) {
+            if (businessId == null) {
+                throw new RuntimeException("Business ID is required for non-admin users.");
+            }
+            business = businessRepository.findById(businessId)
+                    .orElseThrow(() -> new RuntimeException("Business not found."));
 
-        if (!passwordEncoder.matches(inviteCode, business.getInviteCodeHash())) {
-            throw new RuntimeException("Invalid invite code for selected business.");
+            if (!passwordEncoder.matches(inviteCode, business.getInviteCodeHash())) {
+                throw new RuntimeException("Invalid invite code for selected business.");
+            }
         }
 
         User user = new User();
