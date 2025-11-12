@@ -32,7 +32,8 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/business/**",
                                 "/api/stalls/**",
-                                "/api/reservations/**"
+                                "/api/reservations/**",
+                                "/api/payments/**"
                         ).permitAll()
                         .requestMatchers("/api/health").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.bookfair</groupId>
-	<artifactId>user-service</artifactId>
+	<artifactId>server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>user-service</name>
-	<description>Demo project for Spring Boot</description>
+	<name>server</name>
+	<description>Backend of the bookfair reservation system</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -104,6 +104,12 @@
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
             <version>3.5.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.braintreepayments.gateway</groupId>
+            <artifactId>braintree-java</artifactId>
+            <version>3.0.0</version>
         </dependency>
 	</dependencies>
 
