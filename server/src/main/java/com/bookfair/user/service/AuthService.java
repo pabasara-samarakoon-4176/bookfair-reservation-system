@@ -27,8 +27,7 @@ public class AuthService {
             Integer businessId,
             String inviteCode,
             String contactNumber,
-            String role
-    ) {
+            String role) {
         if (userRepository.existsByEmail(email)) {
             throw new RuntimeException("Email already registered");
         }

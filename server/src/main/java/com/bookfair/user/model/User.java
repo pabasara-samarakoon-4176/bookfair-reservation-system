@@ -33,6 +33,7 @@ public class User {
     private List<Reservation> reservations;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Payment> payments;
 
     @ManyToMany
