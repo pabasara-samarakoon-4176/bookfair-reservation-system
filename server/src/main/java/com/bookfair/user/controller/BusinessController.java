@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-
+import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/business")
 @CrossOrigin
@@ -22,32 +22,51 @@ public class BusinessController {
         this.userRepository = userRepository;
     }
 
+//    @GetMapping()
+//    public Map<Integer, Boolean> getBusinesses(@RequestParam(required = false) Integer userId) {
+//
+//        List<Business> businesses = businessRepository.findAll();
+//        Map<Integer, Boolean> result = new LinkedHashMap<>();
+//
+//        if (userId == null) {
+//            for (Business b : businesses) {
+//                result.put(b.getBusinessId(), false);
+//            }
+//
+//            return result;
+//        }
+//
+//        Optional<Integer> userBusinessId = userRepository.findById(userId)
+//                .map(user -> user.getBusiness() != null ? user.getBusiness().getBusinessId() : null);
+//
+//        for (Business b : businesses) {
+//            if (userBusinessId.isPresent() && Objects.equals(userBusinessId.get(), b.getBusinessId())) {
+//                result.put(b.getBusinessId(), true);
+//            } else {
+//                result.put(b.getBusinessId(), false);
+//            }
+//        }
+//
+//        return result;
+//    }
+
+    /**
+     * Get all businesses - returns list with id and name
+     */
     @GetMapping()
-    public Map<Integer, Boolean> getBusinesses(@RequestParam(required = false) Integer userId) {
-
+    public ResponseEntity<List<Map<String, Object>>> getBusinesses() {
         List<Business> businesses = businessRepository.findAll();
-        Map<Integer, Boolean> result = new LinkedHashMap<>();
 
-        if (userId == null) {
-            for (Business b : businesses) {
-                result.put(b.getBusinessId(), false);
-            }
+        List<Map<String, Object>> result = businesses.stream()
+                .map(b -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("id", b.getBusinessId());
+                    map.put("name", b.getName());
+                    return map;
+                })
+                .collect(Collectors.toList());
 
-            return result;
-        }
-
-        Optional<Integer> userBusinessId = userRepository.findById(userId)
-                .map(user -> user.getBusiness() != null ? user.getBusiness().getBusinessId() : null);
-
-        for (Business b : businesses) {
-            if (userBusinessId.isPresent() && Objects.equals(userBusinessId.get(), b.getBusinessId())) {
-                result.put(b.getBusinessId(), true);
-            } else {
-                result.put(b.getBusinessId(), false);
-            }
-        }
-
-        return result;
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{businessId}")
@@ -57,11 +76,4 @@ public class BusinessController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("error", "Business not found")));
     }
-    
-    @GetMapping("/all")
-    public List<Business> getAllBusinesses() {
-    return businessRepository.findAll();
-    }
-
-
 }
