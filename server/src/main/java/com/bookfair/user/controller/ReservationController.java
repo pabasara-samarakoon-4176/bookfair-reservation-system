@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/reservations")
+@RequestMapping("/api/vendor/reservations")
 @CrossOrigin
 public class ReservationController {
 
@@ -68,6 +69,7 @@ public class ReservationController {
         ));
     }
 
+    @Transactional
     @GetMapping("/{userId}")
     public ResponseEntity<?> getReservationsByUser(@PathVariable Integer userId) {
         Optional<User> userOpt = userRepository.findById(userId);

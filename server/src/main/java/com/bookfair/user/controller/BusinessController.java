@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/business")
+@RequestMapping("/api/admin/business")
 @CrossOrigin
 public class BusinessController {
 
@@ -62,6 +62,5 @@ public class BusinessController {
     public List<Business> getAllBusinesses() {
     return businessRepository.findAll();
     }
-
 
 }

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/stalls")
+@RequestMapping("/api/vendor/stalls")
 @CrossOrigin
 public class StallController {
 

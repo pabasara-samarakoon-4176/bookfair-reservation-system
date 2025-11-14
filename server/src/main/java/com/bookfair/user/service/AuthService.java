@@ -7,6 +7,8 @@ import com.bookfair.user.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class AuthService {
 
@@ -47,6 +49,7 @@ public class AuthService {
         user.setBusiness(business);
         user.setContactNumber(contactNumber);
         user.setRole(role);
+        user.setCreatedAt(LocalDateTime.now());
 
         return userRepository.save(user);
     }
