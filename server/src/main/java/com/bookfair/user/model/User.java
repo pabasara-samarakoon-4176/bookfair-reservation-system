@@ -25,7 +25,6 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "business_id")
-    @JsonIgnore
     private Business business;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -33,6 +32,7 @@ public class User {
     private List<Reservation> reservations;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Payment> payments;
 
     @ManyToMany
@@ -41,6 +41,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
+    @JsonIgnore
     private List<Genre> genres;
 
     // Getters and setters

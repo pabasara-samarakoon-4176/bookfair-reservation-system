@@ -43,10 +43,20 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", "User not found"));
         }
+        User user = userOpt.get();
 
-        String paymentResult = braintreePaymentService.processMockPayment(
+        String braintreeCustomerId;
+        try {
+            braintreeCustomerId = braintreePaymentService.findOrCreateCustomer(user, nonce);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Payment preparation failed: " + e.getMessage()));
+        }
+
+        String paymentResult = braintreePaymentService.processPaymentWithCustomer(
                 BigDecimal.valueOf(amount),
-                nonce
+                braintreeCustomerId
         );
 
         String status;
@@ -56,7 +66,7 @@ public class PaymentController {
         if (paymentResult.startsWith("SUCCESS:")) {
             status = "SUCCESS";
             transactionId = paymentResult.substring("SUCCESS: ".length()).trim();
-            message = "Payment completed successfully via Braintree.";
+            message = "Payment completed successfully via Braintree and vaulted.";
         } else {
             status = "FAILED";
             transactionId = "FAIL-" + System.currentTimeMillis();
@@ -64,7 +74,7 @@ public class PaymentController {
         }
 
         Payment payment = new Payment();
-        payment.setUser(userOpt.get());
+        payment.setUser(user);
         payment.setAmount(BigDecimal.valueOf(amount));
         payment.setPaymentMethod(method);
         payment.setTransactionId(transactionId);
